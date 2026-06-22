@@ -1,39 +1,70 @@
-# Setup Custom Fields di UI ERPNext
+# Setup Custom Fields in ERPNext UI
 
-Agar script UI dan Server berjalan dengan lancar, Anda harus membuat 3 Custom Field ini di setiap transaksi yang Anda butuhkan (contoh: **Sales Invoice Item**, **Sales Order Item**, **Purchase Invoice Item**).
+For the Client Script and Server Script to work correctly, you need to create the following custom fields via the **Customize Form** menu in ERPNext.
 
-Silakan ke menu **Customize Form**, pilih DocType target (misal: `Sales Invoice Item`), lalu tambahkan baris-baris berikut di bagian grid `items`:
+---
 
-## 1. Field: custom_user_rate
+## PART 1: Custom Fields on the Item Table (Child DocType)
+
+Add these fields to the item child DocType of each transaction you want to enable (e.g., `Sales Invoice Item`, `Sales Order Item`, `Purchase Invoice Item`, etc.).
+
+Go to **Customize Form** → select the target DocType → add the following fields in the `items` grid section:
+
+### 1. Field: custom_user_rate
 - **Label:** Base Rate
 - **Type:** Currency
 - **Options:** currency
 - **Insert After:** qty
-- **In List View:** Centang (Yes)
+- **In List View:** Checked (Yes)
 - **Columns:** 2
 
-## 2. Field: custom_user_discount_type
+### 2. Field: custom_user_discount_type
 - **Label:** Discount Type
 - **Type:** Select
-- **Options:** 
-  ```text
+- **Options:**
+  ```
   
   Percentage
   Amount
   ```
 - **Insert After:** custom_user_rate
 
-## 3. Field: custom_user_discount_value
+### 3. Field: custom_user_discount_value
 - **Label:** Discount
 - **Type:** Float
 - **Insert After:** custom_user_discount_type
-- **In List View:** Centang (Yes)
+- **In List View:** Checked (Yes)
 - **Columns:** 1
 
 ---
-**LANGKAH PENTING:** 
-Setelah menambahkan 3 field di atas, **sembunyikan** field bawaan ERPNext ini dari tampilan Grid agar user tidak bingung. Masih di **Customize Form**, cari field-field berikut dan **hilangkan centang "In List View"**:
+
+**IMPORTANT STEP:**
+After adding the 3 fields above, **hide** the following built-in ERPNext fields from the Grid view to avoid confusion. In **Customize Form**, find each field below and **uncheck "In List View"**:
 1. `rate`
 2. `price_list_rate`
 3. `discount_percentage`
 4. `discount_amount`
+
+---
+
+## PART 2: Custom Fields on the Header Document (Global Discount)
+
+Add these fields to the header DocType (e.g., `Sales Invoice`, `Purchase Invoice`, `Sales Order`, `Purchase Order`).
+
+Go to **Customize Form** → select the header DocType → add these 2 fields:
+
+### 4. Field: custom_global_discount_type
+- **Label:** Global Discount Type
+- **Type:** Select
+- **Options:**
+  ```
+  
+  Percentage
+  Amount
+  ```
+- **Insert After:** (choose an appropriate field, e.g., after `taxes_and_charges`)
+
+### 5. Field: custom_global_discount_value
+- **Label:** Global Discount Value
+- **Type:** Float
+- **Insert After:** custom_global_discount_type

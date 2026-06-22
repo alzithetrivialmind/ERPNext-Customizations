@@ -1,19 +1,21 @@
 // ==========================================
-// CLIENT SCRIPT (UI ERPNext)
-// DocType: Sales Invoice (atau Purchase Invoice, SO, PO, dll)
-// Apply To: Form
+// CLIENT SCRIPT
+// DocType        : Purchase Receipt
+// Apply To       : Form
+// NOTE           : Only install this script if your business receives
+//                  goods WITHOUT a Purchase Order first.
+//                  If your workflow is always PO → PR, the discount
+//                  is already carried over automatically from the PO
+//                  and this script is not needed.
 // ==========================================
 
 
 // -----------------------------------------------------------
 // PART 1: Auto-fill custom_user_rate when an item is selected
 // -----------------------------------------------------------
-frappe.ui.form.on("Sales Invoice Item", {
+frappe.ui.form.on("Purchase Receipt Item", {
     item_code: function(frm, cdt, cdn) {
         let row = frappe.get_doc(cdt, cdn);
-
-        // Wait briefly for ERPNext to pull the standard price_list_rate,
-        // then copy it into our custom base rate field.
         if (row.item_code && !row.custom_user_rate) {
             setTimeout(() => {
                 let updated_row = frappe.get_doc(cdt, cdn);
@@ -29,16 +31,13 @@ frappe.ui.form.on("Sales Invoice Item", {
 // -----------------------------------------------------------
 // PART 2: Global Discount — Apply to All Items button
 // -----------------------------------------------------------
-frappe.ui.form.on("Sales Invoice", {
+frappe.ui.form.on("Purchase Receipt", {
     refresh: function(frm) {
-
-        // Add a custom button inside a "Discount" group on the toolbar
         frm.add_custom_button("Apply Global Discount to All Items", function() {
 
             let dtype = frm.doc.custom_global_discount_type;
             let dval  = flt(frm.doc.custom_global_discount_value);
 
-            // Validation: make sure user has filled in global discount fields
             if (!dtype) {
                 frappe.msgprint({
                     title: "Missing Input",
@@ -58,7 +57,6 @@ frappe.ui.form.on("Sales Invoice", {
             }
 
             let items = frm.doc.items;
-
             if (!items || items.length === 0) {
                 frappe.msgprint({
                     title: "No Items",
@@ -71,30 +69,21 @@ frappe.ui.form.on("Sales Invoice", {
             let total_rows = items.length;
 
             items.forEach(function(row) {
-
-                // Set the discount type on every row
                 frappe.model.set_value(row.doctype, row.name, "custom_user_discount_type", dtype);
 
                 if (dtype === "Percentage") {
-                    // Same percentage applied to every row
-                    // e.g. Global 10% → every item gets 10% discount
                     frappe.model.set_value(row.doctype, row.name, "custom_user_discount_value", dval);
-
                 } else if (dtype === "Amount") {
-                    // Total amount split equally across all rows
-                    // e.g. Global $900, 3 rows → each row gets $300 total row discount
-                    // Server Script will then divide by qty to get per-unit discount
                     let per_row_discount = flt(dval / total_rows);
                     frappe.model.set_value(row.doctype, row.name, "custom_user_discount_value", per_row_discount);
                 }
             });
 
-            // Show success notification
             frappe.show_alert({
                 message: `Global ${dtype} discount applied to ${total_rows} item(s). Click Save to finalize.`,
                 indicator: "green"
             }, 5);
 
-        }, "Discount"); // <-- Groups the button under a "Discount" dropdown menu
+        }, "Discount");
     }
 });
