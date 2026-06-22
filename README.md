@@ -107,3 +107,21 @@ Repeat this for every header DocType you activate.
 - Reference DocType: match the folder name (e.g., `Sales Invoice`)
 - DocType Event: `Before Validate`
 - Paste the contents of `Server_Script.py`
+
+---
+
+## Additional Customizations
+
+In addition to the Discount Fix, this repository contains other custom scripts organized by feature and purpose:
+
+### 1. Item Management
+- **[Item_List](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Item_List)**: Customizes the Item List view to redirect the standard "Add Item" button to the Item Creator DocType, and adds a quick "Add Service" button.
+- **[Item_Creator](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Item_Creator)**: A custom DocType guided form that dynamically filters item groups and generates normalized Item Codes using the L1-L2-L3 hierarchy.
+- **[Item_Sub_Category_Master](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Item_Sub_Category_Master)**: Automatically generates sequential subcategory codes (e.g. `D001`, `D002`) under `Item Sub Category Master` based on a letter prefix.
+
+### 2. Purchase & Material Workflows
+- **[Material_Request](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Material_Request)**: Optimizes layout columns, filters item selection based on category, and auto-propagates header projects to items.
+- **[Purchase_Order_Print_Status](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Purchase_Order_Print_Status)**: Adds simple print tracking to Purchase Orders, offering a "Mark as Printed" button and automated print event listener.
+- **[Purchase_Order_Palma](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Purchase_Order_Palma)**: Specialized script for PT. Palma Progress Shipyard. Controls item selection based on PO Type, auto-populates defaults and contacts, and shows a hover tooltip displaying the last purchase rate.
+- **[Purchase_Receipt_PO_Flow](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Purchase_Receipt_PO_Flow)**: Replaces standard PO imports with a custom dialog, enforces link constraints before saving, and runs a background monitor to lock/protect PO rates.
+
