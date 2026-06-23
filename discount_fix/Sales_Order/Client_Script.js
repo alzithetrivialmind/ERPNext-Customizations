@@ -1,26 +1,21 @@
 // ==========================================
 // CLIENT SCRIPT
-// DocType        : Purchase Receipt
+// DocType        : Sales Order
 // Apply To       : Form
-// NOTE           : Only install this script if your business receives
-//                  goods WITHOUT a Purchase Order first.
-//                  If your workflow is always PO → PR, the discount
-//                  is already carried over automatically from the PO
-//                  and this script is not needed.
 // ==========================================
 
 
 // -----------------------------------------------------------
-// PART 1: Auto-fill custom_user_rate when an item is selected
+// PART 1: Auto-fill custom_custom_base_rate when an item is selected
 // -----------------------------------------------------------
-frappe.ui.form.on("Purchase Receipt Item", {
+frappe.ui.form.on("Sales Order Item", {
     item_code: function(frm, cdt, cdn) {
         let row = frappe.get_doc(cdt, cdn);
-        if (row.item_code && !row.custom_user_rate) {
+        if (row.item_code && !row.custom_custom_base_rate) {
             setTimeout(() => {
                 let updated_row = frappe.get_doc(cdt, cdn);
                 if (updated_row.price_list_rate) {
-                    frappe.model.set_value(cdt, cdn, "custom_user_rate", updated_row.price_list_rate);
+                    frappe.model.set_value(cdt, cdn, "custom_custom_base_rate", updated_row.price_list_rate);
                 }
             }, 300);
         }
@@ -31,12 +26,12 @@ frappe.ui.form.on("Purchase Receipt Item", {
 // -----------------------------------------------------------
 // PART 2: Global Discount — Apply to All Items button
 // -----------------------------------------------------------
-frappe.ui.form.on("Purchase Receipt", {
+frappe.ui.form.on("Sales Order", {
     refresh: function(frm) {
         frm.add_custom_button("Apply Global Discount to All Items", function() {
 
-            let dtype = frm.doc.custom_global_discount_type;
-            let dval  = flt(frm.doc.custom_global_discount_value);
+            let dtype = frm.doc.custom_new_global_discount_type;
+            let dval  = flt(frm.doc.custom_new_global_discount_value);
 
             if (!dtype) {
                 frappe.msgprint({
@@ -69,13 +64,13 @@ frappe.ui.form.on("Purchase Receipt", {
             let total_rows = items.length;
 
             items.forEach(function(row) {
-                frappe.model.set_value(row.doctype, row.name, "custom_user_discount_type", dtype);
+                frappe.model.set_value(row.doctype, row.name, "custom_custom_discount_type", dtype);
 
                 if (dtype === "Percentage") {
-                    frappe.model.set_value(row.doctype, row.name, "custom_user_discount_value", dval);
+                    frappe.model.set_value(row.doctype, row.name, "custom_new_custom_discount", dval);
                 } else if (dtype === "Amount") {
                     let per_row_discount = flt(dval / total_rows);
-                    frappe.model.set_value(row.doctype, row.name, "custom_user_discount_value", per_row_discount);
+                    frappe.model.set_value(row.doctype, row.name, "custom_new_custom_discount", per_row_discount);
                 }
             });
 

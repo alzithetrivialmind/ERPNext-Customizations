@@ -13,11 +13,11 @@ Every folder includes:
 
 | Folder | DocType | Description |
 |:---|:---|:---|
-| `Sales_Invoice/` | Sales Invoice | Customer billing |
-| `Sales_Order/` | Sales Order | Customer sales order |
-| `Purchase_Invoice/` | Purchase Invoice | Supplier billing |
-| `Purchase_Order/` | Purchase Order | Supplier purchase order |
-| `Purchase_Receipt/` | Purchase Receipt | Goods receipt — ⚠️ Optional, see note below |
+| `discount_fix/Sales_Invoice/` | Sales Invoice | Customer billing |
+| `discount_fix/Sales_Order/` | Sales Order | Customer sales order |
+| `discount_fix/Purchase_Invoice/` | Purchase Invoice | Supplier billing |
+| `discount_fix/Purchase_Order/` | Purchase Order | Supplier purchase order |
+| `discount_fix/Purchase_Receipt/` | Purchase Receipt | Goods receipt — ⚠️ Optional, see note below |
 
 > **Purchase Receipt Note:** Only install these scripts if your business receives goods **without a Purchase Order** first. If your workflow is always PO → PR, the discount is already carried over automatically from the PO — no script needed here.
 

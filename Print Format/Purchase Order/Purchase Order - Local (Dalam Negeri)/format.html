@@ -1,0 +1,235 @@
+{% if doc.custom_po_type == "PO Local" %}
+<div style="padding: 10px; font-family: Arial, Helvetica, sans-serif; font-size: 12px;">
+    <!-- Header dengan Table agar stabil di PDF -->
+    <table style="width: 100%; max-width: 700px; margin: 0 auto 6px auto; border-collapse: collapse;">
+        <tr>
+            <td style="width: 110px; vertical-align: top;">
+                <img src="/files/Logo Palma.png" style="max-width: 90px; max-height: 60px;">
+            </td>
+            <td style="text-align: center; vertical-align: middle;">
+                <div style="font-size: 16px; font-weight: bold; letter-spacing: 1px;">PT. PALMA PROGRESS SHIPYARD</div>
+                <div style="font-size: 11px; margin-top: 1px;">JL. PALMA KAV: 1 - SAGULUNG, PULAU BATAM - INDONESIA
+                </div>
+                <div style="font-size: 11px; margin-top: 1px;">PHONE: (0778) 391 344, 391 455, 391 643 FAX: (0778)
+                    391432</div>
+                <div style="font-size: 11px; margin-top: 1px;">EMAIL: purchasing@palmashipyard.com</div>
+            </td>
+        </tr>
+    </table>
+    <hr style="margin: 6px 0 12px 0; border-top: 2px double #222;">
+    <!-- Judul Purchase Order -->
+    <div style="text-align: center; margin-bottom: 10px;">
+        <div style="font-size: 15px; font-weight: bold; text-decoration: underline;">Purchase Order</div>
+        <div style="font-size: 12px; margin-top: 1px;">LOCAL</div>
+    </div>
+
+    <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
+
+    <!-- Informasi Supplier dan Referensi -->
+    <div style="display: flex; margin-bottom: 10px;">
+        <div style="width: 50%; padding-right: 5px;">
+            <div style="border: 1px solid #ddd; padding: 6px; font-size: 11px;">
+                <h4 style="margin-top: 0; margin-bottom: 4px; font-size: 12px;">Supplier</h4>
+                <p style="margin: 0 0 2px 0;"><strong>{{ doc.supplier_name }}</strong></p>
+
+                <!-- Primary contact supplier -->
+                {% if doc.contact_person %}
+                <p style="margin: 0 0 2px 0;"><strong>Contact Person:</strong> {{ doc.contact_person }}</p>
+                {% endif %}
+
+                <!-- Phone, Mobile dan Fax -->
+                {% if doc.contact_phone %}
+                <p style="margin: 0 0 2px 0;"><strong>Phone:</strong> {{ doc.contact_phone }}</p>
+                {% endif %}
+
+                {% if doc.contact_mobile %}
+                <p style="margin: 0 0 2px 0;"><strong>Mobile No:</strong> {{ doc.contact_mobile }}</p>
+                {% endif %}
+
+                {% if doc.contact_fax %}
+                <p style="margin: 0 0 2px 0;"><strong>Fax:</strong> {{ doc.contact_fax }}</p>
+                {% endif %}
+
+                <!-- Alamat billing supplier (Dipindah ke bawah) -->
+                {% if doc.supplier_address_display or doc.address_display %}
+                <p style="margin: 0 0 2px 0;">{{ doc.supplier_address_display or doc.address_display }}</p>
+                {% else %}
+                <!-- Fallback: Fetch from Supplier Primary Address -->
+                {% set supplier_primary_address = frappe.db.get_value("Supplier", doc.supplier, "primary_address") %}
+                {% if supplier_primary_address %}
+                {% set addr = frappe.db.get_value("Address", supplier_primary_address, ["address_line1",
+                "address_line2",
+                "city", "pincode", "country", "phone"], as_dict=True) %}
+                {% if addr %}
+                <p style="margin: 0 0 2px 0;">
+                    {{ addr.address_line1 }}<br>
+                    {% if addr.address_line2 %}{{ addr.address_line2 }}<br>{% endif %}
+                    {% if addr.city %}{{ addr.city }}{% endif %}
+                    {% if addr.pincode %} {{ addr.pincode }}{% endif %}<br>
+                    {% if addr.country %}{{ addr.country }}{% endif %}
+                    {% if addr.phone %}<br>Phone: {{ addr.phone }}{% endif %}
+                </p>
+                {% endif %}
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <div style="width: 50%; padding-left: 5px;">
+            <div style="border: 1px solid #ddd; padding: 6px; font-size: 11px;">
+                <h4 style="margin-top: 0; margin-bottom: 4px; font-size: 12px;">References</h4>
+                <p style="margin: 0 0 2px 0;"><strong>Our Purchase No:</strong> {{ doc.name }}</p>
+                <p style="margin: 0 0 2px 0;"><strong>Requisition No:</strong> {{ doc.custom_requisition_no or '' }}</p>
+                <p style="margin: 0 0 2px 0;"><strong>Required Date:</strong> {{ frappe.format_date(doc.schedule_date)
+                    if
+                    doc.schedule_date else '' }}</p>
+                <p style="margin: 0 0 2px 0;"><strong>Job No:</strong> {{ doc.custom_job_no or '' }}</p>
+                <p style="margin: 0 0 2px 0;"><strong>Payment Term:</strong> {{ doc.custom_payment_term or '' }}</p>
+                <p style="margin: 0 0 2px 0;"><strong>Order Date:</strong> {{ frappe.format_date(doc.transaction_date)
+                    if
+                    doc.transaction_date else '' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabel Item -->
+    <table border="1" cellpadding="3" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 10px;">
+        <thead style="background-color: #f5f5f5;">
+            <tr>
+                <th style="text-align: center;">No.</th>
+                <th style="width: 35%; text-align: center;">Item Code</th>
+                <th style="width: 12%; text-align: center;">Qty</th>
+                <th style="width: 18%; text-align: center;">Unit Price</th>
+                <th style="width: 20%; text-align: center;">Total Amount</th>
+                <th style="width: 15%; text-align: center;">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in doc.items %}
+            <tr>
+                <td style="text-align: center;">{{ loop.index }}</td>
+                <td>
+                    <strong>{{ item.item_name }}</strong><br>
+                    <span style="font-size: 8px; color: #666;">{{ item.item_code }}</span>
+                </td>
+                <td style="text-align: center;">{{ item.qty }} {{ item.uom }}</td>
+                <td style="text-align: right;">{{ doc.currency }} {{ frappe.utils.fmt_money(item.rate,
+                    currency=doc.currency) }}
+                </td>
+                <td style="text-align: right;">{{ doc.currency }} {{ frappe.utils.fmt_money(item.amount,
+                    currency=doc.currency)
+                    }}</td>
+                <td>{{ item.description }}</td>
+            </tr>
+            {% endfor %}
+            <!-- Row Total -->
+            <tr style="background-color: #f5f5f5; font-weight: bold;">
+                <td style="text-align: center;">-</td>
+                <td style="text-align: center;">TOTAL</td>
+                <td style="text-align: center;">{{ doc.total_qty or 0 }}</td>
+                <td style="text-align: right;">-</td>
+                <td style="text-align: right;">{{ doc.currency }} {{ frappe.utils.fmt_money(doc.total,
+                    currency=doc.currency) }}
+                </td>
+                <td style="text-align: center;">-</td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- Purchase By -->
+    <div style="margin-top: 6px; font-size: 11px;">
+        <strong>Purchase By:</strong> {{ frappe.db.get_value("User", doc.owner, "full_name") or doc.owner or '' }}
+    </div>
+    <!-- Purchase Note -->
+    <div style="margin-top: 6px; font-size: 11px;">
+        <strong>Purchase Note:</strong> {{ doc.custom_purchase_note or '' }}
+    </div>
+
+    <!-- Total, Discount, Tax dan Pajak -->
+    <div style="display: flex; margin-top: 10px;">
+        <div style="width: 50%; padding-right: 5px;">
+            {% if doc.custom_note %}
+            <div style="border: 1px solid #ddd; padding: 6px; font-size: 11px;">
+                <h4 style="margin-top: 0; margin-bottom: 4px; font-size: 12px;">Note</h4>
+                <div>{{ doc.custom_note }}</div>
+            </div>
+            {% endif %}
+        </div>
+        <div style="width: 50%; padding-left: 5px;">
+            {% set gross_subtotal = namespace(value=0.0) %}
+            {% set total_discount = namespace(value=0.0) %}
+            {% for item in doc.items %}
+                {% set item_base_rate = item.custom_custom_base_rate or item.price_list_rate or item.rate or 0.0 %}
+                {% set item_qty = item.qty or 0.0 %}
+                {% set item_discount = (item_base_rate - item.rate) * item_qty %}
+                {% set gross_subtotal.value = gross_subtotal.value + (item_base_rate * item_qty) %}
+                {% set total_discount.value = total_discount.value + item_discount %}
+            {% endfor %}
+            <table border="1" cellpadding="2" cellspacing="0" width="100%"
+                style="border-collapse: collapse; font-size: 9px;">
+                <tbody>
+                    <tr>
+                        <td style="width: 55%; padding: 2px 4px;"><strong>Subtotal</strong></td>
+                        <td style="width: 45%; text-align: right; padding: 2px 4px;">{{ doc.currency }} {{
+                            "{:,.2f}".format(gross_subtotal.value|float) }}</td>
+                    </tr>
+                    {% if total_discount.value > 0.01 %}
+                    <!-- Discount (warna merah) -->
+                    <tr>
+                        <td style="padding: 2px 4px; color: #d9534f;"><strong>Discount</strong></td>
+                        <td style="text-align: right; padding: 2px 4px; color: #d9534f;">- {{ doc.currency }} {{
+                            "{:,.2f}".format(total_discount.value|float) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 2px 4px;"><strong>Net Total</strong></td>
+                        <td style="text-align: right; padding: 2px 4px;">{{ doc.currency }} {{
+                            "{:,.2f}".format(doc.total|float) }}</td>
+                    </tr>
+                    {% endif %}
+                    <!-- Tax (format konsisten) -->
+                    <tr>
+                        <td style="padding: 2px 4px;"><strong>Tax</strong></td>
+                        <td style="text-align: right; padding: 2px 4px;">{{ doc.currency }} {{
+                            "{:,.2f}".format((doc.total_taxes_and_charges or 0)|float) }}</td>
+                    </tr>
+                    <tr style="background-color: #f5f5f5;">
+                        <td style="padding: 2px 4px;"><strong>Grand Total</strong></td>
+                        <td style="text-align: right; padding: 2px 4px;"><strong>{{ doc.currency }} {{
+                                "{:,.2f}".format(doc.grand_total|float) }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Terms dan Tanda Tangan -->
+    <div style="margin-top: 10px;">
+        <div style="border: 1px solid #ddd; padding: 6px; margin-bottom: 10px; font-size: 11px;">
+            <h4 style="margin-top: 0; margin-bottom: 4px; font-size: 12px;">Terms and Conditions</h4>
+            <div>{{ doc.terms or "" }}</div>
+        </div>
+    </div>
+
+    <!-- Footer Tanda Tangan Baru -->
+    <div style="margin-top: 30px; text-align: left; font-size: 11px;">
+        <p style="margin-bottom: 2px;">Best Regards</p>
+        <p style="margin-bottom: 2px;">PT. Palma Progress Shipyard</p>
+        <br><br><br><br>
+        <p style="margin-bottom: 2px;">Authorized Signatory</p>
+        <div style="margin-top: 40px; text-align: left; font-size: 9px; color: #777;">
+            <p style="margin-bottom: 2px;">Distribution: White - Vendor | Blue - Store | Green - Accounting | Yellow -
+                Finance | Pink - Purchasing</p>
+        </div>
+    </div>
+
+    <!-- Script untuk set nama file PDF default -->
+    <script>
+        document.title = "{{ doc.name }}";
+    </script>
+</div>
+{% else %}
+<!-- Format standar jika bukan PO Local -->
+<div>
+    <h1>{{ doc.name }}</h1>
+    <p>{{ doc.supplier_name }}</p>
+    <!-- Tambahkan konten default lainnya -->
+</div>
+{% endif %}

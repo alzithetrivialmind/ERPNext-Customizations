@@ -1,17 +1,22 @@
 # ==========================================
 # SERVER SCRIPT
 # Script Type        : Document Event
-# Reference DocType  : Sales Order
+# Reference DocType  : Purchase Receipt
 # DocType Event      : Before Validate
+# NOTE               : Only install this script if your business
+#                      receives goods WITHOUT a Purchase Order first.
+#                      If your workflow is always PO → PR, the discount
+#                      is already carried over automatically from the PO
+#                      and this script is not needed.
 # ==========================================
 
 for item in doc.items:
-    if not item.get("custom_user_rate") and item.get("item_code"):
-        item.custom_user_rate = item.get("price_list_rate") or item.get("rate") or 0.0
+    if not item.get("custom_custom_base_rate") and item.get("item_code"):
+        item.custom_custom_base_rate = item.get("price_list_rate") or item.get("rate") or 0.0
 
-    baseline = flt(item.get("custom_user_rate"))
-    dtype    = item.get("custom_user_discount_type")
-    dval     = flt(item.get("custom_user_discount_value"))
+    baseline = flt(item.get("custom_custom_base_rate"))
+    dtype    = item.get("custom_custom_discount_type")
+    dval     = flt(item.get("custom_new_custom_discount"))
     qty      = flt(item.get("qty")) or 1.0
 
     if dtype == "Percentage":

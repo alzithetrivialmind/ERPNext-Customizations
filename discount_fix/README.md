@@ -10,7 +10,7 @@ Add these fields to the item child DocType of each transaction you want to enabl
 
 Go to **Customize Form** → select the target DocType → add the following fields in the `items` grid section:
 
-### 1. Field: custom_user_rate
+### 1. Field: custom_custom_base_rate
 - **Label:** Base Rate
 - **Type:** Currency
 - **Options:** currency
@@ -18,7 +18,7 @@ Go to **Customize Form** → select the target DocType → add the following fie
 - **In List View:** Checked (Yes)
 - **Columns:** 2
 
-### 2. Field: custom_user_discount_type
+### 2. Field: custom_custom_discount_type
 - **Label:** Discount Type
 - **Type:** Select
 - **Options:**
@@ -27,12 +27,12 @@ Go to **Customize Form** → select the target DocType → add the following fie
   Percentage
   Amount
   ```
-- **Insert After:** custom_user_rate
+- **Insert After:** custom_custom_base_rate
 
-### 3. Field: custom_user_discount_value
+### 3. Field: custom_new_custom_discount
 - **Label:** Discount
 - **Type:** Float
-- **Insert After:** custom_user_discount_type
+- **Insert After:** custom_custom_discount_type
 - **In List View:** Checked (Yes)
 - **Columns:** 1
 
@@ -53,7 +53,7 @@ Add these fields to the header DocType (e.g., `Sales Invoice`, `Purchase Invoice
 
 Go to **Customize Form** → select the header DocType → add these 2 fields:
 
-### 4. Field: custom_global_discount_type
+### 4. Field: custom_new_global_discount_type
 - **Label:** Global Discount Type
 - **Type:** Select
 - **Options:**
@@ -64,7 +64,38 @@ Go to **Customize Form** → select the header DocType → add these 2 fields:
   ```
 - **Insert After:** (choose an appropriate field, e.g., after `taxes_and_charges`)
 
-### 5. Field: custom_global_discount_value
-- **Label:** Global Discount Value
+### 5. Field: custom_new_global_discount_value
+- **Label:** New Global Discount Value
 - **Type:** Float
-- **Insert After:** custom_global_discount_type
+- **Insert After:** custom_new_global_discount_type
+
+---
+
+## PART 3: Install Scripts in ERPNext
+
+After setting up the custom fields in Customize Form, proceed to add the scripts in ERPNext:
+
+### 1. How to Setup Client Script
+1. Navigate to **Client Script** → click **New**.
+2. Set the following fields:
+   - **Name:** (e.g., `discount_fix_po` or `discount_fix_so`)
+   - **DocType:** Select the target DocType (e.g., `Purchase Order`, `Sales Invoice`, etc.)
+   - **Apply To:** `Form`
+   - **Enabled:** Checked
+3. In the **Script** code editor:
+   - Copy the entire code from the transaction's `Client_Script.js` file (e.g., `discount_fix/Purchase_Order/Client_Script.js`).
+   - Paste it into the script area (replacing the template skeleton).
+4. Click **Save**.
+
+### 2. How to Setup Server Script
+1. Navigate to **Server Script** → click **New**.
+2. Set the following fields:
+   - **Name:** (e.g., `discount_fix_po` or `discount_fix_so`)
+   - **Script Type:** `DocType Event`
+   - **Reference Document Type:** Select the target DocType (e.g., `Purchase Order`, `Sales Invoice`, etc.)
+   - **DocType Event:** `Before Validate`
+   - **Disabled:** Unchecked (keep enabled)
+3. In the **Script** code editor:
+   - Copy the entire code from the transaction's `Server_Script.py` file (e.g., `discount_fix/Purchase_Order/Server_Script.py`).
+   - Paste it into the script area.
+4. Click **Save**.

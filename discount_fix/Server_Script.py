@@ -6,13 +6,13 @@
 # ==========================================
 
 for item in doc.items:
-    # 1. Initialize custom_user_rate only if completely empty AND item_code exists
-    if not item.get("custom_user_rate") and item.get("item_code"):
-        item.custom_user_rate = item.get("price_list_rate") or item.get("rate") or 0.0
+    # 1. Initialize custom_custom_base_rate only if completely empty AND item_code exists
+    if not item.get("custom_custom_base_rate") and item.get("item_code"):
+        item.custom_custom_base_rate = item.get("price_list_rate") or item.get("rate") or 0.0
 
-    baseline = flt(item.get("custom_user_rate"))
-    dtype    = item.get("custom_user_discount_type")
-    dval     = flt(item.get("custom_user_discount_value"))
+    baseline = flt(item.get("custom_custom_base_rate"))
+    dtype    = item.get("custom_custom_discount_type")
+    dval     = flt(item.get("custom_new_custom_discount"))
     qty      = flt(item.get("qty")) or 1.0
 
     # 2. Calculate discount

@@ -1,0 +1,134 @@
+{% if doc.doctype == "Stock Entry" %}
+<div style="padding: 10px; font-family: Arial, Helvetica, sans-serif; font-size: 12px;">
+    <!-- Header -->
+    <table style="width: 100%; max-width: 700px; margin: 0 auto 6px auto; border-collapse: collapse;">
+        <tr>
+            <td style="width: 110px; vertical-align: top;">
+                <img src="/files/Logo Palma.png" style="max-width: 90px; max-height: 60px;">
+            </td>
+            <td style="text-align: center; vertical-align: middle;">
+                <div style="font-size: 16px; font-weight: bold; letter-spacing: 1px;">PT. PALMA PROGRESS SHIPYARD</div>
+                <div style="font-size: 11px; margin-top: 1px;">JL. PALMA KAV: 1 - SAGULUNG, PULAU BATAM - INDONESIA
+                </div>
+                <div style="font-size: 11px; margin-top: 1px;">PHONE: (0778) 391 344, 391 455, 391 643 FAX: (0778)
+                    391432</div>
+            </td>
+        </tr>
+    </table>
+    <hr style="margin: 6px 0 12px 0; border-top: 2px double #222;">
+
+    <!-- Title -->
+    <div style="text-align: center; margin-bottom: 10px;">
+        <div style="font-size: 15px; font-weight: bold; text-decoration: underline;">STOCK ENTRY</div>
+        <div style="font-size: 12px; margin-top: 2px;">{{ doc.stock_entry_type or '' }}</div>
+    </div>
+
+    <!-- Number at top-right -->
+    <div style="text-align: right; margin-bottom: 10px;">
+        <div
+            style="font-size: 12px; font-weight: bold; border: 2px solid #000; padding: 4px 8px; display: inline-block;">
+            No : {{ doc.name }}</div>
+    </div>
+
+    <hr style="margin: 10px 0; border-top: 1px solid #ddd;">
+
+    <!-- Header info -->
+    <div style="display: flex; margin-bottom: 10px;">
+        <div style="width: 50%; padding-right: 5px;">
+            <table style="width: 100%; font-size: 11px;">
+                <tr>
+                    <td style="width: 40%; padding: 2px 0;"><strong>DATE:</strong></td>
+                    <td style="width: 60%; padding: 2px 0;">{{ frappe.format_date(doc.posting_date) if doc.posting_date
+                        else '' }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px 0;"><strong>PROJECT:</strong></td>
+                    <td style="padding: 2px 0;">
+                        {% set _header_project = (doc.project or (doc.items[0].project if (doc.items and
+                        doc.items[0].project) else None)) %}
+                        {{ frappe.db.get_value('Project', _header_project, 'project_name') or (_header_project or '') }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="width: 50%; padding-left: 5px;">
+            <table style="width: 100%; font-size: 11px;">
+                <tr>
+                    <td style="width: 40%; padding: 2px 0;"><strong>COMPANY:</strong></td>
+                    <td style="width: 60%; padding: 2px 0;">{{ doc.company or '' }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px 0;"><strong>FROM WAREHOUSE:</strong></td>
+                    <td style="padding: 2px 0;">{{ doc.from_warehouse or doc.set_warehouse or '' }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px 0;"><strong>TO WAREHOUSE:</strong></td>
+                    <td style="padding: 2px 0;">{{ doc.to_warehouse or '' }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Items Table -->
+    <table border="1" cellpadding="3" cellspacing="0" width="100%" style="border-collapse: collapse; font-size: 10px;">
+        <thead style="background-color: #f5f5f5;">
+            <tr>
+                <th style="width: 18%; text-align: center;">ITEM CODE</th>
+                <th style="width: 30%; text-align: center;">ITEM NAME</th>
+                <th style="width: 10%; text-align: center;">QTY</th>
+                <th style="width: 15%; text-align: center;">PROJECT</th>
+                <th style="width: 27%; text-align: center;">DESCRIPTION</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in doc.items %}
+            <tr>
+                <td>{{ item.item_code }}</td>
+                <td>{{ item.item_name or '' }}</td>
+                <td style="text-align: center;">{{ item.qty }}</td>
+                <td>{{ frappe.db.get_value('Project', (item.project or doc.project), 'project_name') or (item.project or
+                    doc.project or '') }}</td>
+                <td>{{ item.description or '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Location/Date above signatures -->
+    <div style="margin-top: 12px; text-align: right; font-size: 11px;">
+        Sagulung, {{ frappe.format_date(doc.posting_date) if doc.posting_date else '' }}
+    </div>
+
+    <!-- Signatures -->
+    <div style="margin-top: 14px;">
+        <table border="1" cellpadding="8" cellspacing="0" width="100%"
+            style="border-collapse: collapse; font-size: 10px;">
+            <tr>
+                <td style="width: 33.33%; text-align: center; vertical-align: top;">
+                    <div style="font-weight: bold; margin-bottom: 40px;">Operator</div>
+                    <div style="margin-top: 10px;">Name:</div>
+                    <div style="margin-top: 5px;">Position:</div>
+                </td>
+                <td style="width: 33.33%; text-align: center; vertical-align: top;">
+                    <div style="font-weight: bold; margin-bottom: 40px;">Taken By</div>
+                    <div style="margin-top: 10px;">Name:</div>
+                    <div style="margin-top: 5px;">Position:</div>
+                </td>
+                <td style="width: 33.33%; text-align: center; vertical-align: top;">
+                    <div style="font-weight: bold; margin-bottom: 40px;">Issued By</div>
+                    <div style="margin-top: 10px;">Name:</div>
+                    <div style="margin-top: 5px;">Position:</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% else %}
+<!-- Fallback if printed from another doctype -->
+<div>
+    <h1>{{ doc.name }}</h1>
+    <p>{{ doc.doctype }}</p>
+    <p>This print format is intended for Stock Entry.</p>
+    <p>Fields available: Item Code, Item Name, Qty, Project, Description.</p>
+</div>
+{% endif %}
