@@ -1,43 +1,45 @@
 # Stock Ledger Customizations
 
-Direktori ini berisi kustomisasi Query Report untuk modul **Stock Ledger** di ERPNext. Kustomisasi utama difokuskan pada penambahan kolom spesifik (*Custom Fields*) dan restrukturisasi tampilan pohon (*Tree View*).
+This directory contains Query Report customizations for the **Stock Ledger** module in ERPNext. The primary customizations focus on adding transaction-specific columns (Custom Fields) and restructuring the layout into a chronological Tree View.
 
-## Daftar Report
+## Reports List
 - **Stock Ledger with SR Fields** (`stock_ledger_with_sr_fields`)
-  Laporan ini merupakan turunan dan modifikasi dari laporan standar *Stock Ledger*.
+  This report is a derivative and modification of the standard ERPNext *Stock Ledger* report.
 
-## Fitur Utama "Stock Ledger with SR Fields"
+## Key Features of "Stock Ledger with SR Fields"
 
-### 1. Penambahan Kolom Stock Reconciliation (SR) Fields
-Laporan ini telah diperkaya dengan penarikan data dari *Stock Reconciliation Item*. Jika sebuah *Stock Ledger Entry* (SLE) berasal dari *Stock Reconciliation*, laporan akan secara otomatis menarik data *custom fields* seperti:
-- Kode Lama
-- Nomor & Tanggal RDO
-- Nomor & Tanggal RIO
-- Tipe Transaksi
-- Supplier Historis
-- Data PIB (Nomor, Tahun, Bulan, Tanggal, Kurs pada PIB)
-- Data Invoice Vendor (Nomor Invoice, Kurs USD, dsb.)
+### 1. Addition of Stock Reconciliation (SR) Fields
+The report has been enriched to fetch data directly from *Stock Reconciliation Item* records. If a *Stock Ledger Entry* (SLE) originates from a *Stock Reconciliation*, the report automatically retrieves custom fields such as:
+- Old Item Code (Kode Lama)
+- RDO Number & Date
+- RIO Number & Date
+- Transaction Type
+- Historical Supplier
+- PIB Data (PIB Number, Year, Month, Date, and Exchange Rate at PIB)
+- Vendor Invoice Data (Invoice Number, USD Exchange Rate, etc.)
 
-### 2. Multi-Currency & Kalkulasi Nilai USD
-Laporan secara otomatis menghitung nilai USD. Jika sumber penerimaan (Purchase Receipt/Purchase Invoice) menggunakan mata uang USD, laporan langsung menarik *vendor rate*. Jika selain USD, sistem akan menarik data kurs (Exchange Rate) historis pada bulan terjadinya transaksi dari USD ke IDR untuk mengalkulasi mundur ke ekuivalen USD.
+### 2. Multi-Currency & USD Value Calculation
+The report automatically calculates and displays the transaction value in USD:
+- If the source receipt (Purchase Receipt / Purchase Invoice) was recorded in USD, the report pulls the *vendor rate* directly.
+- If the currency is not USD, the system fetches historical exchange rates (from USD to IDR) for the transaction month to back-calculate the equivalent value in USD.
 
-### 3. Tree View Kronologis Berbasis Histori & FIFO
-Ini adalah perombakan besar dari format tabel (*flat table*) standar:
-- Laporan bisa di-*toggle* menjadi **Tree View**.
-- Struktur pohon diurutkan secara **kronologis (histori waktu)**, bukan dipecah berdasarkan "Inward" (Masuk) dan "Outward" (Keluar).
-- **Struktur Hierarki Laporan:**
+### 3. Chronological, History-Based FIFO Tree View
+This is a significant overhaul of the standard flat table format:
+- The report can be toggled into a **Tree View**.
+- The tree structure is ordered **chronologically (time history)** rather than being split into "Inward" and "Outward".
+- **Hierarchical Report Structure:**
   - `[Level 0] ITEM-CODE (Item Name)`
     - `[Level 1] Opening Balance`
-      - `[Level 2] (Opening Details)`: Sisa antrean penerimaan (*Ekor FIFO*) dari bulan-bulan sebelumnya yang membentuk saldo awal periode saat ini.
+      - `[Level 2] (Opening Details)`: The remaining queue of incoming stock (FIFO tail) from previous months that forms the starting balance of the current period.
     - `[Level 1] Transactions Progress`
-      - `[Level 2]`: Riwayat pergerakan stok (gabungan PR, PI, Issue, dsb) dalam bulan berjalan, diurutkan secara presisi berdasarkan tanggal dan waktu.
+      - `[Level 2]`: Stock movement history (consolidated PR, PI, Issue, etc.) during the current month, sorted precisely by date and time.
     - `[Level 1] Closing Balance`
 
-Keunggulan dari format ini adalah pengguna (terutama tim *Accounting*) dapat melacak *costing* FIFO secara transparan, memahami darimana angka saldo awal berasal, dan membaca pergerakan stok layaknya sebuah buku tabungan kronologis.
+The advantage of this format is that users (especially the Accounting team) can trace FIFO costing transparently, understand exactly where the opening balance figures came from, and read stock movements chronologically like a bank passbook.
 
-## Cara Pemasangan (Deployment)
-Karena laporan ini berbasis *Query Report*, Anda dapat langsung menimpa atau membuat laporan baru di instance ERPNext Anda:
-1. Masuk ke DocType **Report**.
-2. Buat report baru (atau modifikasi `Stock Ledger with SR Fields`).
-3. Set **Report Type** menjadi `Query Report`.
-4. Salin kode `.py` dan `.js` ke dalam modul ERPNext di *server file system*, atau sesuaikan agar dibaca oleh sistem Frappe Anda.
+## Deployment Instructions
+Since this is a *Query Report*, you can create or replace it on your ERPNext instance as follows:
+1. Navigate to the **Report** DocType in ERPNext.
+2. Create a new report (or modify the existing `Stock Ledger with SR Fields` report).
+3. Set **Report Type** to `Query Report`.
+4. Copy the `.py` and `.js` code into the corresponding directory on your Frappe server filesystem, or adjust the path so that it is properly loaded by your Frappe app.

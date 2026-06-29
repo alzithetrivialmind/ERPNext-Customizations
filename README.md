@@ -1,127 +1,57 @@
-# ERPNext Customizations — Discount Fix
+# ERPNext Customizations
 
-This customization adds a more flexible discount input mechanism to ERPNext transaction documents, supporting both per-item discounts and a global discount applied to all items at once.
-
----
-
-## Folder Structure
-
-Each folder contains scripts for one specific DocType.
-Every folder includes:
-- `Client_Script.js` — Paste into the **Client Script** menu in ERPNext
-- `Server_Script.py` — Paste into the **Server Script** menu in ERPNext
-
-| Folder | DocType | Description |
-|:---|:---|:---|
-| `discount_fix/Sales_Invoice/` | Sales Invoice | Customer billing |
-| `discount_fix/Sales_Order/` | Sales Order | Customer sales order |
-| `discount_fix/Purchase_Invoice/` | Purchase Invoice | Supplier billing |
-| `discount_fix/Purchase_Order/` | Purchase Order | Supplier purchase order |
-| `discount_fix/Purchase_Receipt/` | Purchase Receipt | Goods receipt — ⚠️ Optional, see note below |
-
-> **Purchase Receipt Note:** Only install these scripts if your business receives goods **without a Purchase Order** first. If your workflow is always PO → PR, the discount is already carried over automatically from the PO — no script needed here.
+This repository contains Client Scripts, Server Scripts, Query Reports, and Print Formats designed to extend and optimize various workflows in ERPNext.
 
 ---
 
-## Custom Fields Required in ERPNext
+## Directory Overview
 
-### A. On the Item Table (Child DocType) — Required for all transactions
+The repository is organized by feature and functionality. Each folder contains the necessary scripts, setup instructions, and HTML format templates:
 
-Go to **Customize Form** → select the appropriate item DocType → add these 3 fields:
+### 1. [Discount Fix](file:///c:/Users/USER/Downloads/ERPNext-Customizations/discount_fix)
+Implements a highly flexible discount input mechanism supporting:
+- **Per-Item Discounts**: Select percentage or absolute amount per line item.
+- **Global Discounts**: Apply a total discount value from the header, split equally among all items.
+- Works across: `Sales Invoice`, `Sales Order`, `Purchase Invoice`, `Purchase Order`, and `Purchase Receipt`.
+- *See the detailed setup and documentation inside the [discount_fix](file:///c:/Users/USER/Downloads/ERPNext-Customizations/discount_fix) folder.*
 
-| Header DocType | Item DocType (use this in Customize Form) |
-|:---|:---|
-| Sales Invoice | Sales Invoice Item |
-| Sales Order | Sales Order Item |
-| Purchase Invoice | Purchase Invoice Item |
-| Purchase Order | Purchase Order Item |
-| Purchase Receipt | Purchase Receipt Item |
+### 2. [Stock Ledger Customizations](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Stock%20Ledger)
+Customizes the ERPNext Stock Ledger report to provide:
+- **Tree View Mode**: Replaces flat tables with chronological time history.
+- **Stock Reconciliation Integration**: Retrieves custom fields like PIB details, Historical Supplier, and RDO/RIO dates.
+- **Multi-Currency Costing**: Back-calculates transaction values in USD using historical exchange rates.
 
-**Fields to add:**
+### 3. Item Management
+- **[Item_Creator](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Item_Creator)**: A guided DocType and API form that dynamically filters item groups and generates standardized Item Codes using L1-L2-L3 categorization prefix patterns.
+- **[Item_List](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Item_List)**: Redirects the default "Add Item" button in the Item List view to the `Item Creator` form and provides a premium-styled "Add Service" action.
+- **[Item_Sub_Category_Master](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Item_Sub_Category_Master)**: Automatically generates sequential subcategory codes (e.g., `D001` → `D002`) based on letter prefixes.
 
-| Field Name | Label | Type | Options | In List View |
-|:---|:---|:---|:---|:---:|
-| `custom_custom_base_rate` | Base Rate | Currency | currency | Yes |
-| `custom_custom_discount_type` | Discount Type | Select | (blank) / Percentage / Amount | No |
-| `custom_new_custom_discount` | Discount | Float | — | Yes |
+### 4. Purchase & Material Workflows
+- **[Material_Request](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Material_Request)**: Optimizes layout columns in the items grid, filters subcontracting suppliers, auto-propagates header projects to items, and filters category selections.
+- **[Purchase_Order_Print_Status](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Purchase_Order_Print_Status)**: Tracks print events on Purchase Orders, adding simple flags and a toolbar button to mark records as printed.
+- **[Purchase_Order_Palma](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Purchase_Order_Palma)**: Specialized optimizations for PT. Palma Progress Shipyard. Validates and filters item selections based on PO Type, auto-fills default variables, and shows a hover tooltip displaying the last purchase rate for each item.
+- **[Purchase_Receipt_PO_Flow](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Purchase_Receipt_PO_Flow)**: Enforces that all goods receipts are linked to valid Purchase Orders and locks the rate fields (with an observer mechanism) to protect contracted prices.
 
-**Hide built-in ERPNext fields from Grid View** (uncheck "In List View" for each):
-- `rate`
-- `price_list_rate`
-- `discount_percentage`
-- `discount_amount`
-
----
-
-### B. On the Header Document — Required for the Global Discount feature
-
-Go to **Customize Form** → select the header DocType (e.g., `Sales Invoice`) → add these 2 fields:
-
-| Field Name | Label | Type | Options |
-|:---|:---|:---|:---|
-| `custom_new_global_discount_type` | Global Discount Type | Select | (blank) / Percentage / Amount |
-| `custom_new_global_discount_value` | Global Discount Value | Float | — |
-
-Repeat this for every header DocType you activate.
+### 5. [Print Formats](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Print%20Format)
+Premium HTML/CSS print format templates for key documents:
+- **Material Request**: Custom format templates for Material Requests (Purpose to Issue, Purpose to Purchase).
+- **Purchase Order**: Standard print formats for Domestic, Foreign, Service, and Steel material POs.
+- **Purchase Receipt**: Custom Goods Receipt layout.
+- **Stock Entry**: Optimized format template for stock transfers and adjustments.
 
 ---
 
-## How to Use
+## Deployment and Setup
 
-### Per-Item Discount
-1. Open a transaction document
-2. Add items to the item table
-3. Fill in the **Discount Type** and **Discount** columns on each row you want to discount
-4. Click **Save**
+Each subdirectory contains its own `README.md` with detailed installation steps. In general, scripts are applied in ERPNext as follows:
 
-### Global Discount (All Items at Once)
-1. Fill in the **Global Discount Type** and **Global Discount Value** fields in the document header
-2. Click the **Discount → Apply Global Discount to All Items** button in the toolbar
-3. Manually edit individual rows if any item needs a different discount
-4. Click **Save**
-5. To change and reapply → update the global value → click Apply again (**Reapply**) → Save
+### Client Scripts
+1. Navigate to **Client Script** → **New**.
+2. Select the target **DocType**, set **Apply To** to `Form` (or `List` as specified), and ensure it is enabled.
+3. Paste the content of `Client_Script.js` and click **Save**.
 
----
-
-## Calculation Behavior
-
-| Type | Level | How it works |
-|:---|:---|:---|
-| Percentage | Per-item | Same % deducted from each unit price |
-| Amount (per-item) | Per-row | Total row discount ÷ qty = discount per unit |
-| Amount (global) | All rows | Total global ÷ number of rows = discount per row, then ÷ qty for per-unit |
-
----
-
-## How to Install in ERPNext
-
-### Client Script
-- Go to: ERPNext → Client Script → New
-- DocType: match the folder name (e.g., `Sales Invoice`)
-- Apply To: `Form`
-- Paste the contents of `Client_Script.js`
-
-### Server Script
-- Go to: ERPNext → Server Script → New
-- Script Type: `Document Event`
-- Reference DocType: match the folder name (e.g., `Sales Invoice`)
-- DocType Event: `Before Validate`
-- Paste the contents of `Server_Script.py`
-
----
-
-## Additional Customizations
-
-In addition to the Discount Fix, this repository contains other custom scripts organized by feature and purpose:
-
-### 1. Item Management
-- **[Item_List](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Item_List)**: Customizes the Item List view to redirect the standard "Add Item" button to the Item Creator DocType, and adds a quick "Add Service" button.
-- **[Item_Creator](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Item_Creator)**: A custom DocType guided form that dynamically filters item groups and generates normalized Item Codes using the L1-L2-L3 hierarchy.
-- **[Item_Sub_Category_Master](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Item_Sub_Category_Master)**: Automatically generates sequential subcategory codes (e.g. `D001`, `D002`) under `Item Sub Category Master` based on a letter prefix.
-
-### 2. Purchase & Material Workflows
-- **[Material_Request](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Material_Request)**: Optimizes layout columns, filters item selection based on category, and auto-propagates header projects to items.
-- **[Purchase_Order_Print_Status](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Purchase_Order_Print_Status)**: Adds simple print tracking to Purchase Orders, offering a "Mark as Printed" button and automated print event listener.
-- **[Purchase_Order_Palma](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Purchase_Order_Palma)**: Specialized script for PT. Palma Progress Shipyard. Controls item selection based on PO Type, auto-populates defaults and contacts, and shows a hover tooltip displaying the last purchase rate.
-- **[Purchase_Receipt_PO_Flow](file:///c:/Users/USER/Downloads/ERPNext-Customizations/Purchase_Receipt_PO_Flow)**: Replaces standard PO imports with a custom dialog, enforces link constraints before saving, and runs a background monitor to lock/protect PO rates.
-
+### Server Scripts
+1. Navigate to **Server Script** → **New**.
+2. Select the appropriate **Script Type** (e.g., `Document Event` or `API`).
+3. Set the event hook (e.g., `Before Validate`, `Before Save`) or API route name.
+4. Paste the content of `Server_Script.py` and click **Save**.
