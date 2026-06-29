@@ -1,0 +1,15 @@
+# Ignore Excel files and temp files
+*.xlsx
+*.xls
+~$*.xlsx
+~$*.xls
+
+# Ignore CSV files (containing company/internal data)
+*.csv
+
+# Ignore extraction/temporary data directories
+extract data/
+
+# OS specific files
+.DS_Store
+Thumbs.db
