@@ -3,23 +3,46 @@
 // DocType        : Purchase Order
 // Apply To       : Form
 // ==========================================
+//
+// 2-WAY SYNC LOGIC:
+//   custom_custom_base_rate <--> price_list_rate
+//
+//   Direction A (user edits C. Base Rate):
+//     custom_custom_base_rate handler → calculate_row_discount → sets price_list_rate = baseline
+//
+//   Direction B (ERPNext updates price_list_rate, e.g. after item_code fetch):
+//     price_list_rate handler → sets custom_custom_base_rate = price_list_rate
+//     This then triggers Direction A automatically.
+//
+//   Loop prevention: the price_list_rate handler only fires if the difference is > 0.001,
+//   so after Direction A sets price_list_rate, the handler sees no difference and stops.
+// ==========================================
 
 
 // -----------------------------------------------------------
-// PART 1: Auto-fill custom_custom_base_rate when an item is selected
+// PART 1: Real-time row discount calculation + 2-way sync
 // -----------------------------------------------------------
 frappe.ui.form.on("Purchase Order Item", {
     item_code: function(frm, cdt, cdn) {
+        // When an item is selected, ERPNext will fetch price_list_rate asynchronously.
+        // The price_list_rate handler below will then auto-sync to custom_custom_base_rate.
+        // No setTimeout needed anymore — the sync is triggered by price_list_rate change.
+    },
+
+    // Direction B: ERPNext price_list_rate → custom_custom_base_rate
+    price_list_rate: function(frm, cdt, cdn) {
         let row = frappe.get_doc(cdt, cdn);
-        if (row.item_code && !row.custom_custom_base_rate) {
-            setTimeout(() => {
-                let updated_row = frappe.get_doc(cdt, cdn);
-                if (updated_row.price_list_rate) {
-                    frappe.model.set_value(cdt, cdn, "custom_custom_base_rate", updated_row.price_list_rate);
-                }
-            }, 300);
+        let new_plr = flt(row.price_list_rate);
+        let cur_cbr = flt(row.custom_custom_base_rate);
+
+        // Only sync if meaningfully different to prevent infinite loop
+        if (new_plr > 0 && Math.abs(new_plr - cur_cbr) > 0.001) {
+            frappe.model.set_value(cdt, cdn, "custom_custom_base_rate", new_plr);
+            // This triggers the custom_custom_base_rate handler → calculate_row_discount
         }
     },
+
+    // Direction A: custom_custom_base_rate → price_list_rate (via calculate_row_discount)
     custom_custom_base_rate: function(frm, cdt, cdn) {
         frm.events.calculate_row_discount(frm, cdt, cdn);
     },
@@ -36,7 +59,7 @@ frappe.ui.form.on("Purchase Order Item", {
 
 
 // -----------------------------------------------------------
-// PART 2: Global Discount — Apply to All Items button
+// PART 2: Global Discount — Connect to inline button and apply to all rows
 // -----------------------------------------------------------
 frappe.ui.form.on("Purchase Order", {
     // Triggered when clicking the custom inline button in the form
@@ -115,6 +138,7 @@ frappe.ui.form.on("Purchase Order", {
             discount_amt = baseline;
         }
 
+        // Sync Direction A: custom_custom_base_rate → price_list_rate
         frappe.model.set_value(cdt, cdn, "price_list_rate", baseline);
         frappe.model.set_value(cdt, cdn, "discount_amount", discount_amt);
         if (baseline > 0) {
