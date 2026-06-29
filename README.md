@@ -41,9 +41,9 @@ Go to **Customize Form** → select the appropriate item DocType → add these 3
 
 | Field Name | Label | Type | Options | In List View |
 |:---|:---|:---|:---|:---:|
-| `custom_user_rate` | Base Rate | Currency | currency | Yes |
-| `custom_user_discount_type` | Discount Type | Select | (blank) / Percentage / Amount | No |
-| `custom_user_discount_value` | Discount | Float | — | Yes |
+| `custom_custom_base_rate` | Base Rate | Currency | currency | Yes |
+| `custom_custom_discount_type` | Discount Type | Select | (blank) / Percentage / Amount | No |
+| `custom_new_custom_discount` | Discount | Float | — | Yes |
 
 **Hide built-in ERPNext fields from Grid View** (uncheck "In List View" for each):
 - `rate`
@@ -59,8 +59,8 @@ Go to **Customize Form** → select the header DocType (e.g., `Sales Invoice`) �
 
 | Field Name | Label | Type | Options |
 |:---|:---|:---|:---|
-| `custom_global_discount_type` | Global Discount Type | Select | (blank) / Percentage / Amount |
-| `custom_global_discount_value` | Global Discount Value | Float | — |
+| `custom_new_global_discount_type` | Global Discount Type | Select | (blank) / Percentage / Amount |
+| `custom_new_global_discount_value` | Global Discount Value | Float | — |
 
 Repeat this for every header DocType you activate.
 
