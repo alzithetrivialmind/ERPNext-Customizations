@@ -7,8 +7,6 @@
 # Ignore CSV files (containing company/internal data)
 *.csv
 
-# Ignore extraction/temporary data directories
-extract data/
 
 # OS specific files
 .DS_Store
