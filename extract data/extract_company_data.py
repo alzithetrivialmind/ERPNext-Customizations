@@ -50,7 +50,17 @@ def parse_line(line):
     Parses a single messy line of company/rate data.
     """
     if not line:
-        return {}
+        return {
+            "Original Text": "",
+            "Error/Note": "EMPTY ROW",
+            "Ref Code": "",
+            "Internal Company": "",
+            "Vendor / Supplier": "ADJUSTMENT COMPANY",
+            "Transaction Details": "",
+            "Foreign Currency": "",
+            "Foreign Rate": "",
+            "Exchange Rate": ""
+        }
     
     original = line.strip()
     # Check for empty or generic info notes
@@ -63,10 +73,10 @@ def parse_line(line):
     ]:
         return {
             "Original Text": original,
-            "Error/Note": original.upper(),
+            "Error/Note": original.upper() if original else "EMPTY ROW",
             "Ref Code": "",
             "Internal Company": "",
-            "Vendor / Supplier": "",
+            "Vendor / Supplier": "ADJUSTMENT COMPANY",
             "Transaction Details": "",
             "Foreign Currency": "",
             "Foreign Rate": "",
@@ -220,6 +230,9 @@ def parse_line(line):
         
     details = " - ".join([d for d in details_list if d.lower() != vendor.lower()]).strip(", -")
     
+    if not vendor:
+        vendor = "ADJUSTMENT COMPANY"
+    
     return {
         "Original Text": original,
         "Ref Code": ref_code.upper(),
@@ -234,13 +247,22 @@ def parse_line(line):
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    input_path = os.path.join(script_dir, "EQ - Item to import.csv")
-    output_path = os.path.join(script_dir, "Cleaned_Item_to_import.csv")
     
-    if not os.path.exists(input_path):
-        print(f"Error: Input file not found at {input_path}")
+    # Try Book1.csv first, then EQ - Item to import.csv
+    input_names = ["Book1.csv", "EQ - Item to import.csv"]
+    input_path = None
+    for name in input_names:
+        path = os.path.join(script_dir, name)
+        if os.path.exists(path):
+            input_path = path
+            break
+            
+    if not input_path:
+        print(f"Error: Neither Book1.csv nor EQ - Item to import.csv found in {script_dir}")
         return
         
+    output_path = os.path.join(script_dir, "Cleaned_Item_to_import.csv")
+    
     print(f"Reading from: {input_path}")
     print("Parsing rows and formatting company names...")
     
@@ -282,9 +304,8 @@ def main():
             writer.writeheader()
             
             for row in reader:
-                if not row:
-                    continue
-                parsed = parse_line(row[0])
+                raw_text = row[0] if row else ""
+                parsed = parse_line(raw_text)
                 writer.writerow(parsed)
                 rows_written += 1
                 

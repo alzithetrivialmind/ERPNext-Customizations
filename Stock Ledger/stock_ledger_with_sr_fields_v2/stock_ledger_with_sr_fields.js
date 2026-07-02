@@ -158,6 +158,13 @@ frappe.query_reports["Stock Ledger with SR Fields"] = {
 
 		return value;
 	},
+	get_datatable_options: function(options) {
+		let show_tree = frappe.query_report.get_filter_value("show_tree_view");
+		if (show_tree) {
+			options.sortable = false; // Disable frontend sorting to prevent breaking the tree hierarchy
+		}
+		return options;
+	}
 };
 
 erpnext.utils.add_inventory_dimensions("Stock Ledger with SR Fields", 10);

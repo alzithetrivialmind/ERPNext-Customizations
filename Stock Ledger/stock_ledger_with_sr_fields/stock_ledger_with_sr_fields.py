@@ -213,6 +213,8 @@ def update_available_serial_nos(available_serial_nos, sle):
 def get_columns(filters):
 	columns = [
 		{"label": _("Date"), "fieldname": "date", "fieldtype": "Datetime", "width": 150},
+		{"label": _("Posting Date"), "fieldname": "posting_date", "fieldtype": "Date", "width": 100},
+		{"label": _("Posting Time"), "fieldname": "posting_time", "fieldtype": "Time", "width": 100},
 		{
 			"label": _("Item"),
 			"fieldname": "item_code",
@@ -750,7 +752,8 @@ def get_all_sles_for_fifo(filters, items):
 		.on((sle.voucher_detail_no == sri.name) & (sle.voucher_type == "Stock Reconciliation"))
 		.select(
 			sle.name, sle.item_code, sle.warehouse, sle.posting_datetime,
-			sle.actual_qty, sle.voucher_type, sle.voucher_no, sle.voucher_detail_no,
+			sle.actual_qty, sle.valuation_rate, sle.incoming_rate,
+			sle.voucher_type, sle.voucher_no, sle.voucher_detail_no,
 			sle.posting_date, sle.posting_time, sle.creation,
 			sri.custom_sr_kode_lama,
 			sri.custom_sr_no_rdo,
@@ -787,10 +790,9 @@ def get_all_sles_for_fifo(filters, items):
 	return query.run(as_dict=True)
 
 def enrich_sl_entries_with_procurement_details(sl_entries, filters, items):
-	if not sl_entries:
-		return []
-
 	all_sles = get_all_sles_for_fifo(filters, items)
+	if not all_sles:
+		return sl_entries, {}
 	
 	# Fetch all required procurement details
 	pr_item_ids = [s.voucher_detail_no for s in all_sles if s.voucher_type == 'Purchase Receipt' and s.voucher_detail_no]
@@ -900,6 +902,8 @@ def enrich_sl_entries_with_procurement_details(sl_entries, filters, items):
 	for s in all_sles:
 		if s.actual_qty > 0:
 			info = {
+				"voucher_no": s.voucher_no, "voucher_type": s.voucher_type,
+				"posting_date": s.posting_date, "posting_time": s.posting_time,
 				"purchase_order": None, "po_date": None,
 				"purchase_receipt": None, "pr_date": None,
 				"purchase_invoice": None, "pi_date": None,
@@ -1038,7 +1042,7 @@ def enrich_sl_entries_with_procurement_details(sl_entries, filters, items):
 
 		if s.actual_qty > 0:
 			info = procurement_info.get(s.name, {}).copy()
-			fifo_queues[key].append({"qty": s.actual_qty, "procurement": info})
+			fifo_queues[key].append({"qty": s.actual_qty, "rate": flt(s.valuation_rate) or flt(s.incoming_rate), "procurement": info})
 
 		elif s.actual_qty < 0:
 			qty_to_consume = abs(s.actual_qty)
@@ -1127,6 +1131,13 @@ def convert_to_tree_view(data, item_details, filters, opening_fifo_queues):
 				
 	all_items = set(transactions_by_item.keys()).union(set(generic_opening_by_item.keys()))
 	
+	if opening_fifo_queues:
+		for (q_item, q_warehouse), pieces in opening_fifo_queues.items():
+			if filters.get("warehouse") and q_warehouse != filters.get("warehouse"):
+				continue
+			if pieces:
+				all_items.add(q_item)
+	
 	for item_code in all_items:
 		txs = transactions_by_item.get(item_code, [])
 		
@@ -1149,7 +1160,18 @@ def convert_to_tree_view(data, item_details, filters, opening_fifo_queues):
 			opening_value = flt(first_tx.get("stock_value", 0)) - flt(first_tx.get("stock_value_difference", 0))
 			opening_rate = flt(opening_value / opening_qty) if opening_qty else 0.0
 		else:
-			opening_qty = opening_value = opening_rate = 0.0
+			from erpnext.stock.stock_ledger import get_previous_sle
+			
+			last_entry = get_previous_sle({
+				"item_code": item_code,
+				"warehouse_condition": get_warehouse_condition(filters.get("warehouse")) if filters.get("warehouse") else "",
+				"posting_date": filters.get("from_date"),
+				"posting_time": "00:00:00"
+			}) or {}
+			
+			opening_qty = flt(last_entry.get("qty_after_transaction", 0))
+			opening_value = flt(last_entry.get("stock_value", 0))
+			opening_rate = flt(last_entry.get("valuation_rate", 0))
 			
 		# Calculate closing balance
 		if txs:
@@ -1201,17 +1223,21 @@ def convert_to_tree_view(data, item_details, filters, opening_fifo_queues):
 		if item_opening_pieces:
 			for idx, piece in enumerate(item_opening_pieces):
 				qty = piece.get("qty", 0)
+				rate = piece.get("rate", 0)
 				proc = piece.get("procurement", {})
 				piece_row = frappe._dict({
 					"indent_name": f"{item_code}_opening_detail_{idx}",
 					"parent_row": f"{item_code}_opening",
 					"indent": 2,
 					"in_qty": qty,
+					"incoming_rate": rate,
+					"valuation_rate": rate,
+					"stock_value": qty * rate,
 					"usd_currency": "USD",
 				})
 				piece_row.update(proc)
 				
-				voucher_ref = proc.get("purchase_receipt") or proc.get("purchase_invoice") or proc.get("purchase_order") or _("Previous Receipt")
+				voucher_ref = proc.get("voucher_no") or proc.get("purchase_receipt") or proc.get("purchase_invoice") or proc.get("purchase_order") or _("Previous Receipt")
 				piece_row["date"] = f"{_('Sisa dari')} {voucher_ref}"
 				tree_data.append(piece_row)
 		
