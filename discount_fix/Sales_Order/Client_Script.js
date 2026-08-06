@@ -6,27 +6,27 @@
 
 
 // -----------------------------------------------------------
-// PART 1: Auto-fill custom_custom_base_rate & trigger real-time row discount calculation
+// PART 1: Auto-fill custom_palma_base_rate & trigger real-time row discount calculation
 // -----------------------------------------------------------
 frappe.ui.form.on("Sales Order Item", {
     item_code: function(frm, cdt, cdn) {
         let row = frappe.get_doc(cdt, cdn);
-        if (row.item_code && !row.custom_custom_base_rate) {
+        if (row.item_code && !row.custom_palma_base_rate) {
             setTimeout(() => {
                 let updated_row = frappe.get_doc(cdt, cdn);
                 if (updated_row.price_list_rate) {
-                    frappe.model.set_value(cdt, cdn, "custom_custom_base_rate", updated_row.price_list_rate);
+                    frappe.model.set_value(cdt, cdn, "custom_palma_base_rate", updated_row.price_list_rate);
                 }
             }, 300);
         }
     },
-    custom_custom_base_rate: function(frm, cdt, cdn) {
+    custom_palma_base_rate: function(frm, cdt, cdn) {
         frm.events.calculate_row_discount(frm, cdt, cdn);
     },
-    custom_custom_discount_type: function(frm, cdt, cdn) {
+    custom_palma_discount_type: function(frm, cdt, cdn) {
         frm.events.calculate_row_discount(frm, cdt, cdn);
     },
-    custom_new_custom_discount: function(frm, cdt, cdn) {
+    custom_palma_discount_amount: function(frm, cdt, cdn) {
         frm.events.calculate_row_discount(frm, cdt, cdn);
     },
     qty: function(frm, cdt, cdn) {
@@ -45,8 +45,8 @@ frappe.ui.form.on("Sales Order", {
     },
 
     apply_global_discount: function(frm) {
-        let dtype = frm.doc.custom_new_global_discount_type;
-        let dval  = flt(frm.doc.custom_new_global_discount_value);
+        let dtype = frm.doc.custom_palma_global_disc_type;
+        let dval  = flt(frm.doc.custom_palma_global_disc_value);
 
         if (!dtype) {
             frappe.msgprint({
@@ -79,13 +79,13 @@ frappe.ui.form.on("Sales Order", {
         let total_rows = items.length;
 
         items.forEach(function(row) {
-            frappe.model.set_value(row.doctype, row.name, "custom_custom_discount_type", dtype);
+            frappe.model.set_value(row.doctype, row.name, "custom_palma_discount_type", dtype);
 
             if (dtype === "Percentage") {
-                frappe.model.set_value(row.doctype, row.name, "custom_new_custom_discount", dval);
+                frappe.model.set_value(row.doctype, row.name, "custom_palma_discount_amount", dval);
             } else if (dtype === "Amount") {
                 let per_row_discount = flt(dval / total_rows);
-                frappe.model.set_value(row.doctype, row.name, "custom_new_custom_discount", per_row_discount);
+                frappe.model.set_value(row.doctype, row.name, "custom_palma_discount_amount", per_row_discount);
             }
         });
 
@@ -97,9 +97,9 @@ frappe.ui.form.on("Sales Order", {
 
     calculate_row_discount: function(frm, cdt, cdn) {
         let row = frappe.get_doc(cdt, cdn);
-        let baseline = flt(row.custom_custom_base_rate);
-        let dtype = row.custom_custom_discount_type;
-        let dval = flt(row.custom_new_custom_discount);
+        let baseline = flt(row.custom_palma_base_rate);
+        let dtype = row.custom_palma_discount_type;
+        let dval = flt(row.custom_palma_discount_amount);
         let qty = flt(row.qty) || 1.0;
 
         let discount_amt = 0.0;

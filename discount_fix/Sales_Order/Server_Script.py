@@ -6,12 +6,12 @@
 # ==========================================
 
 for item in doc.items:
-    if not item.get("custom_custom_base_rate") and item.get("item_code"):
-        item.custom_custom_base_rate = item.get("price_list_rate") or item.get("rate") or 0.0
+    if not item.get("custom_palma_base_rate") and item.get("item_code"):
+        item.custom_palma_base_rate = item.get("price_list_rate") or item.get("rate") or 0.0
 
-    baseline = flt(item.get("custom_custom_base_rate"))
-    dtype    = item.get("custom_custom_discount_type")
-    dval     = flt(item.get("custom_new_custom_discount"))
+    baseline = flt(item.get("custom_palma_base_rate"))
+    dtype    = item.get("custom_palma_discount_type")
+    dval     = flt(item.get("custom_palma_discount_amount"))
     qty      = flt(item.get("qty")) or 1.0
 
     if dtype == "Percentage":

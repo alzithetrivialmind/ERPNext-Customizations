@@ -157,7 +157,7 @@
             {% set gross_subtotal = namespace(value=0.0) %}
             {% set total_discount = namespace(value=0.0) %}
             {% for item in doc.items %}
-                {% set item_base_rate = item.custom_custom_base_rate or item.price_list_rate or item.rate or 0.0 %}
+                {% set item_base_rate = item.custom_palma_base_rate or item.price_list_rate or item.rate or 0.0 %}
                 {% set item_qty = item.qty or 0.0 %}
                 {% set item_discount = (item_base_rate - item.rate) * item_qty %}
                 {% set gross_subtotal.value = gross_subtotal.value + (item_base_rate * item_qty) %}

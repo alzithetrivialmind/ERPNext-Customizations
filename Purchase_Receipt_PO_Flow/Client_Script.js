@@ -44,6 +44,16 @@ function show_pick_po_dialog(frm) {
                 frm._allowed_items = records.map(d => d.item_code);
                 frm._po_item_map = {};
                 frm._po_item_data = {}; // Cache full PO item data
+
+                // Sync currency and exchange rates from PO to PR header
+                if (po.currency) frm.doc.currency = po.currency;
+                if (po.buying_price_list) frm.doc.buying_price_list = po.buying_price_list;
+                if (po.price_list_currency) frm.doc.price_list_currency = po.price_list_currency;
+                if (po.conversion_rate) frm.doc.conversion_rate = po.conversion_rate;
+                if (po.plc_conversion_rate) frm.doc.plc_conversion_rate = po.plc_conversion_rate;
+                
+                frm.refresh_fields(['currency', 'buying_price_list', 'price_list_currency', 'conversion_rate', 'plc_conversion_rate']);
+
                 records.forEach(d => {
                     frm._po_item_map[d.item_code] = d.name;
                     frm._po_item_data[d.item_code] = d;

@@ -31,9 +31,9 @@ Add these fields to the child table DocType of each transaction (e.g., `Sales In
 
 | Field Name | Label | Type | Options | In List View | Columns | Insert After |
 |:---|:---|:---|:---|:---:|:---:|:---|
-| `custom_custom_base_rate` | Base Rate | Currency | currency | Yes | 2 | `qty` |
-| `custom_custom_discount_type` | Discount Type | Select | `\nPercentage\nAmount` | No | — | `custom_custom_base_rate` |
-| `custom_new_custom_discount` | Discount | Float | — | Yes | 1 | `custom_custom_discount_type` |
+| `custom_palma_base_rate` | Base Rate | Currency | currency | Yes | 2 | `qty` |
+| `custom_palma_discount_type` | Discount Type | Select | `\nPercentage\nAmount` | No | — | `custom_palma_base_rate` |
+| `custom_palma_discount_amount` | Discount | Float | — | Yes | 1 | `custom_palma_discount_type` |
 
 **IMPORTANT:**
 To avoid UI confusion, **uncheck "In List View"** for the following standard ERPNext fields in the child table Customize Form grid:
@@ -49,8 +49,8 @@ Add these fields to the main header DocType (e.g., `Sales Invoice`, `Purchase Or
 
 | Field Name | Label | Type | Options | Insert After |
 |:---|:---|:---|:---|:---|
-| `custom_new_global_discount_type` | Global Discount Type | Select | `\nPercentage\nAmount` | (e.g., after `taxes_and_charges`) |
-| `custom_new_global_discount_value` | Global Discount Value | Float | — | `custom_new_global_discount_type` |
+| `custom_palma_global_disc_type` | Global Discount Type | Select | `\nPercentage\nAmount` | (e.g., after `taxes_and_charges`) |
+| `custom_palma_global_disc_value` | Global Discount Value | Float | — | `custom_palma_global_disc_type` |
 
 ---
 
