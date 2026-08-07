@@ -63,7 +63,7 @@ frappe.ui.form.on("Purchase Receipt Item", {
 // -----------------------------------------------------------
 frappe.ui.form.on("Purchase Receipt", {
     // Triggered when clicking the custom inline button in the form
-    custom_apply_global_discount: function(frm) {
+    custom_palma_global_disc_apply: function(frm) {
         frm.events.apply_global_discount(frm);
     },
 

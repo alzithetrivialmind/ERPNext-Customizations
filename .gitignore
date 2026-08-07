@@ -7,6 +7,9 @@
 # Ignore CSV files (containing company/internal data)
 *.csv
 
+# Python cache
+__pycache__/
+*.pyc
 
 # OS specific files
 .DS_Store

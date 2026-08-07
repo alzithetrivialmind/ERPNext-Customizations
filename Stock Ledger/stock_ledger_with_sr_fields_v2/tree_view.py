@@ -83,11 +83,17 @@ def convert_to_tree_view(data, item_details, filters, opening_fifo_queues):
 			opening_rate = flt(last_entry.get("valuation_rate", 0))
 			
 		# Calculate closing balance
+		total_in_qty = 0.0
+		total_out_qty = 0.0
+		
 		if txs:
 			last_tx = txs[-1]
 			closing_qty = flt(last_tx.get("qty_after_transaction", 0))
 			closing_value = flt(last_tx.get("stock_value", 0))
 			closing_rate = flt(last_tx.get("valuation_rate", 0))
+			
+			total_in_qty = sum(flt(tx.get("in_qty", 0)) for tx in txs)
+			total_out_qty = sum(flt(tx.get("out_qty", 0)) for tx in txs)
 		else:
 			closing_qty = opening_qty
 			closing_value = opening_value
@@ -103,6 +109,8 @@ def convert_to_tree_view(data, item_details, filters, opening_fifo_queues):
 			"item_code": item_code,
 			"item_name": item_name,
 			"stock_uom": item_info.get("stock_uom"),
+			"in_qty": total_in_qty,
+			"out_qty": total_out_qty,
 			"qty_after_transaction": closing_qty,
 			"valuation_rate": closing_rate,
 			"in_out_rate": closing_rate,

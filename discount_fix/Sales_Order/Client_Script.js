@@ -40,7 +40,7 @@ frappe.ui.form.on("Sales Order Item", {
 // -----------------------------------------------------------
 frappe.ui.form.on("Sales Order", {
     // Triggered when clicking the custom inline button in the form
-    custom_apply_global_discount: function(frm) {
+    custom_palma_global_disc_apply: function(frm) {
         frm.events.apply_global_discount(frm);
     },
 
