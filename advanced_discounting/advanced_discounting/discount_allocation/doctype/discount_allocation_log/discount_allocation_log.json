@@ -1,0 +1,140 @@
+{
+    "actions": [],
+    "creation": "2026-08-12 22:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "purchase_receipt_item",
+        "item_code",
+        "column_break_1",
+        "purchase_order",
+        "purchase_order_item",
+        "section_break_amounts",
+        "po_eligible_total",
+        "po_discount_pool",
+        "column_break_2",
+        "pr_row_amount",
+        "allocated_discount",
+        "section_break_method",
+        "allocation_method",
+        "column_break_3",
+        "is_closing_receipt"
+    ],
+    "fields": [
+        {
+            "fieldname": "purchase_receipt_item",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "PR Item Row",
+            "read_only": 1,
+            "columns": 2
+        },
+        {
+            "fieldname": "item_code",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Item Code",
+            "options": "Item",
+            "read_only": 1,
+            "columns": 2
+        },
+        {
+            "fieldname": "column_break_1",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "purchase_order",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Purchase Order",
+            "options": "Purchase Order",
+            "read_only": 1,
+            "columns": 2
+        },
+        {
+            "fieldname": "purchase_order_item",
+            "fieldtype": "Data",
+            "label": "PO Item Row",
+            "read_only": 1
+        },
+        {
+            "fieldname": "section_break_amounts",
+            "fieldtype": "Section Break",
+            "label": "Amounts"
+        },
+        {
+            "fieldname": "po_eligible_total",
+            "fieldtype": "Currency",
+            "label": "PO Eligible Total",
+            "read_only": 1,
+            "description": "Total PO amount across all discount-eligible items"
+        },
+        {
+            "fieldname": "po_discount_pool",
+            "fieldtype": "Currency",
+            "label": "PO Discount Pool",
+            "read_only": 1,
+            "description": "Sum of discount_amount from all eligible PO Item rows"
+        },
+        {
+            "fieldname": "column_break_2",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "pr_row_amount",
+            "fieldtype": "Currency",
+            "label": "PR Row Amount",
+            "read_only": 1,
+            "description": "qty × price_list_rate for this PR item row"
+        },
+        {
+            "fieldname": "allocated_discount",
+            "fieldtype": "Currency",
+            "in_list_view": 1,
+            "label": "Allocated Discount",
+            "read_only": 1,
+            "bold": 1,
+            "columns": 2
+        },
+        {
+            "fieldname": "section_break_method",
+            "fieldtype": "Section Break",
+            "label": "Allocation Detail"
+        },
+        {
+            "fieldname": "allocation_method",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "label": "Method",
+            "read_only": 1,
+            "columns": 1,
+            "description": "'proportional' or 'remainder'"
+        },
+        {
+            "fieldname": "column_break_3",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "is_closing_receipt",
+            "fieldtype": "Check",
+            "label": "Is Closing Receipt",
+            "read_only": 1,
+            "default": "0",
+            "description": "Checked if this receipt absorbed the exact remainder to prevent FP drift"
+        }
+    ],
+    "index_web_pages_for_search": 0,
+    "istable": 1,
+    "links": [],
+    "modified": "2026-08-12 22:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Discount Allocation",
+    "name": "Discount Allocation Log",
+    "naming_rule": "Random",
+    "owner": "Administrator",
+    "permissions": [],
+    "sort_field": "creation",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 0
+}

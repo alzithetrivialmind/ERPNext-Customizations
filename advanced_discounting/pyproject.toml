@@ -1,0 +1,8 @@
+[project]
+name = "advanced_discounting"
+version = "1.0.0"
+description = "PO→PR discount allocation and PI/PR discount management"
+authors = [
+    {name = "Palma Progress Shipyard", email = "alzi@palmashipyard.com"}
+]
+requires-python = ">=3.10"

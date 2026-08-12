@@ -1,0 +1,45 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Order Item",
+  "fieldname": "custom_disc_eligible",
+  "fieldtype": "Check",
+  "insert_after": "discount_amount",
+  "label": "Discount Eligible",
+  "default": "0",
+  "description": "Marks this PO row as participating in the PO-level discount pool"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Receipt",
+  "fieldname": "custom_disc_is_historical",
+  "fieldtype": "Check",
+  "insert_after": "set_warehouse",
+  "label": "Historical Entry",
+  "default": "0",
+  "description": "When checked, skips proportional discount auto-calculation entirely"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Receipt",
+  "fieldname": "custom_disc_allocation_log",
+  "fieldtype": "Table",
+  "options": "Discount Allocation Log",
+  "insert_after": "items",
+  "label": "Discount Allocation Log"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Receipt Item",
+  "fieldname": "custom_disc_allocated_discount",
+  "fieldtype": "Currency",
+  "insert_after": "discount_amount",
+  "label": "Allocated Discount",
+  "read_only": 1,
+  "description": "Proportional share of PO discount allocated to this PR row (Audit only - standard discount_amount is also updated)"
+ }
+]

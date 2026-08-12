@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+from setuptools import setup, find_packages
+
+with open("requirements.txt") as f:
+    install_requires = f.read().strip().split("\n")
+
+setup(
+    name="advanced_discounting",
+    version="1.0.0",
+    description="PO→PR discount allocation and PI/PR discount management",
+    author="Palma Progress Shipyard",
+    author_email="alzi@palmashipyard.com",
+    packages=find_packages(),
+    zip_safe=False,
+    include_package_data=True,
+    install_requires=install_requires,
+)
