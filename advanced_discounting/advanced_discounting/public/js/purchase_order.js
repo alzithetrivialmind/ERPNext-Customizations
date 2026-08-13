@@ -36,6 +36,18 @@ frappe.ui.form.on("Purchase Order Item", {
 
 
 frappe.ui.form.on("Purchase Order", {
+    onload: function(frm) {
+        frm.events.ensure_fields_visible(frm);
+    },
+    refresh: function(frm) {
+        frm.events.ensure_fields_visible(frm);
+    },
+    ensure_fields_visible: function(frm) {
+        frm.set_df_property("custom_sec_palma_discount", "hidden", 0);
+        frm.set_df_property("custom_palma_global_disc_type", "hidden", 0);
+        frm.set_df_property("custom_palma_global_disc_value", "hidden", 0);
+        frm.set_df_property("custom_apply_global_discount", "hidden", 0);
+    },
     custom_apply_global_discount: function(frm) {
         frm.events.apply_global_discount(frm);
     },
