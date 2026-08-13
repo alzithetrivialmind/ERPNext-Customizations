@@ -10,6 +10,7 @@ required_apps = ["frappe", "erpnext"]
 # Client-side scripts loaded on every Desk page
 # --------------------------------------------------------------------------
 app_include_js = [
+    "/assets/advanced_discounting/js/purchase_order.js",
     "/assets/advanced_discounting/js/purchase_invoice.js",
     "/assets/advanced_discounting/js/purchase_receipt.js",
 ]
@@ -18,6 +19,12 @@ app_include_js = [
 # Document Events
 # --------------------------------------------------------------------------
 doc_events = {
+    "Purchase Order": {
+        "before_validate": (
+            "advanced_discounting.purchase_discounting"
+            ".purchase_order_discount.before_validate"
+        ),
+    },
     "Purchase Receipt": {
         "validate": (
             "advanced_discounting.discount_allocation"
@@ -52,7 +59,14 @@ fixtures = [
                     "Purchase Receipt-custom_disc_is_historical",
                     "Purchase Receipt-custom_disc_allocation_log",
                     "Purchase Receipt Item-custom_disc_allocated_discount",
-                    # ── Module 2: PI discount fields (already exist) ──
+                    # ── Module 2: PO discount fields ──
+                    "Purchase Order Item-custom_palma_base_rate",
+                    "Purchase Order Item-custom_palma_discount_type",
+                    "Purchase Order Item-custom_palma_discount_amount",
+                    "Purchase Order-custom_palma_global_disc_type",
+                    "Purchase Order-custom_palma_global_disc_value",
+                    "Purchase Order-custom_apply_global_discount",
+                    # ── Module 2: PI discount fields ──
                     "Purchase Invoice Item-custom_palma_base_rate",
                     "Purchase Invoice Item-custom_palma_discount_type",
                     "Purchase Invoice Item-custom_palma_discount_amount",

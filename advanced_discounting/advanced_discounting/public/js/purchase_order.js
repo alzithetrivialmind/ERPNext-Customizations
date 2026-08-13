@@ -1,36 +1,11 @@
 // ==========================================
-// Advanced Discounting — Purchase Invoice Client Script
+// Advanced Discounting — Purchase Order Client Script
 // Loaded via app_include_js in hooks.py
 // ==========================================
-//
-// Migrated from: discount_fix/Purchase_Invoice/Client_Script.js
-//
-// 2-WAY SYNC LOGIC:
-//   custom_palma_base_rate <--> price_list_rate
-//
-//   Direction A (user edits C. Base Rate):
-//     custom_palma_base_rate handler → calculate_row_discount → sets price_list_rate = baseline
-//
-//   Direction B (ERPNext updates price_list_rate, e.g. after item_code fetch):
-//     price_list_rate handler → sets custom_palma_base_rate = price_list_rate
-//     This then triggers Direction A automatically.
-//
-//   Loop prevention: the price_list_rate handler only fires if the difference is > 0.001,
-//   so after Direction A sets price_list_rate, the handler sees no difference and stops.
-//
-// CHANGE FROM LEGACY:
-//   Global discount Amount-type distribution now uses VALUE-WEIGHTED allocation
-//   instead of equal split across rows. This is an intentional behavioral change.
-// ==========================================
 
-
-// -----------------------------------------------------------
-// PART 1: Real-time row discount calculation + 2-way sync
-// -----------------------------------------------------------
-frappe.ui.form.on("Purchase Invoice Item", {
+frappe.ui.form.on("Purchase Order Item", {
     item_code: function(frm, cdt, cdn) {
-        // When an item is selected, ERPNext will fetch price_list_rate asynchronously.
-        // The price_list_rate handler below will then auto-sync to custom_palma_base_rate.
+        // Asynchronous price_list_rate fetch will sync to custom_palma_base_rate
     },
 
     // Direction B: ERPNext price_list_rate → custom_palma_base_rate
@@ -39,14 +14,12 @@ frappe.ui.form.on("Purchase Invoice Item", {
         let new_plr = flt(row.price_list_rate);
         let cur_cbr = flt(row.custom_palma_base_rate);
 
-        // Only sync if meaningfully different to prevent infinite loop
         if (new_plr > 0 && Math.abs(new_plr - cur_cbr) > 0.001) {
             frappe.model.set_value(cdt, cdn, "custom_palma_base_rate", new_plr);
-            // This triggers the custom_palma_base_rate handler → calculate_row_discount
         }
     },
 
-    // Direction A: custom_palma_base_rate → price_list_rate (via calculate_row_discount)
+    // Direction A: custom_palma_base_rate → price_list_rate
     custom_palma_base_rate: function(frm, cdt, cdn) {
         frm.events.calculate_row_discount(frm, cdt, cdn);
     },
@@ -62,11 +35,7 @@ frappe.ui.form.on("Purchase Invoice Item", {
 });
 
 
-// -----------------------------------------------------------
-// PART 2: Global Discount + row calc
-// -----------------------------------------------------------
-frappe.ui.form.on("Purchase Invoice", {
-    // Triggered when clicking the custom inline button in the form
+frappe.ui.form.on("Purchase Order", {
     custom_apply_global_discount: function(frm) {
         frm.events.apply_global_discount(frm);
     },
@@ -106,7 +75,6 @@ frappe.ui.form.on("Purchase Invoice", {
         let total_rows = items.length;
 
         if (dtype === "Percentage") {
-            // Percentage: same percentage to every row
             items.forEach(function(row) {
                 frappe.model.set_value(row.doctype, row.name, "custom_palma_discount_type", dtype);
                 frappe.model.set_value(row.doctype, row.name, "custom_palma_discount_amount", dval);
@@ -168,7 +136,6 @@ frappe.ui.form.on("Purchase Invoice", {
             discount_amt = baseline;
         }
 
-        // Sync Direction A: custom_palma_base_rate → price_list_rate
         frappe.model.set_value(cdt, cdn, "price_list_rate", baseline);
         frappe.model.set_value(cdt, cdn, "discount_amount", discount_amt);
         if (baseline > 0) {

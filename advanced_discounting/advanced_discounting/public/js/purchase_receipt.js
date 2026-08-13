@@ -33,12 +33,14 @@
 // -----------------------------------------------------------
 frappe.ui.form.on("Purchase Receipt Item", {
     item_code: function(frm, cdt, cdn) {
+        if (frm.doc.custom_disc_is_historical) return;
         // When an item is selected / PO rate is populated, price_list_rate will be set.
         // The price_list_rate handler below will auto-sync to custom_palma_base_rate.
     },
 
     // Direction B: ERPNext price_list_rate → custom_palma_base_rate
     price_list_rate: function(frm, cdt, cdn) {
+        if (frm.doc.custom_disc_is_historical) return;
         let row = frappe.get_doc(cdt, cdn);
         let new_plr = flt(row.price_list_rate);
         let cur_cbr = flt(row.custom_palma_base_rate);
@@ -52,15 +54,19 @@ frappe.ui.form.on("Purchase Receipt Item", {
 
     // Direction A: custom_palma_base_rate → price_list_rate (via calculate_row_discount)
     custom_palma_base_rate: function(frm, cdt, cdn) {
+        if (frm.doc.custom_disc_is_historical) return;
         frm.events.calculate_row_discount(frm, cdt, cdn);
     },
     custom_palma_discount_type: function(frm, cdt, cdn) {
+        if (frm.doc.custom_disc_is_historical) return;
         frm.events.calculate_row_discount(frm, cdt, cdn);
     },
     custom_palma_discount_amount: function(frm, cdt, cdn) {
+        if (frm.doc.custom_disc_is_historical) return;
         frm.events.calculate_row_discount(frm, cdt, cdn);
     },
     qty: function(frm, cdt, cdn) {
+        if (frm.doc.custom_disc_is_historical) return;
         frm.events.calculate_row_discount(frm, cdt, cdn);
     }
 });
@@ -76,6 +82,15 @@ frappe.ui.form.on("Purchase Receipt", {
     },
 
     apply_global_discount: function(frm) {
+        if (frm.doc.custom_disc_is_historical) {
+            frappe.msgprint({
+                title: "Historical Entry Active",
+                message: "Cannot apply global discount because Historical Entry is checked.",
+                indicator: "orange"
+            });
+            return;
+        }
+
         let dtype = frm.doc.custom_palma_global_disc_type;
         let dval  = flt(frm.doc.custom_palma_global_disc_value);
 
@@ -116,7 +131,7 @@ frappe.ui.form.on("Purchase Receipt", {
                 frappe.model.set_value(row.doctype, row.name, "custom_palma_discount_amount", dval);
             });
         } else if (dtype === "Amount") {
-            // Amount: VALUE-WEIGHTED distribution (changed from legacy equal split)
+            // Amount: VALUE-WEIGHTED distribution with REMAINDER ABSORPTION on last row
             let total_amount = items.reduce(function(sum, r) {
                 return sum + flt(r.custom_palma_base_rate) * flt(r.qty || 1);
             }, 0);
@@ -130,9 +145,17 @@ frappe.ui.form.on("Purchase Receipt", {
                 return;
             }
 
-            items.forEach(function(row) {
-                let row_amount = flt(row.custom_palma_base_rate) * flt(row.qty || 1);
-                let per_row_discount = flt(dval * (row_amount / total_amount));
+            let allocated_so_far = 0.0;
+            items.forEach(function(row, idx) {
+                let per_row_discount = 0.0;
+                if (idx === items.length - 1) {
+                    // Absorbs exact remainder on last item row to prevent FP drift
+                    per_row_discount = flt(dval - allocated_so_far, 2);
+                } else {
+                    let row_amount = flt(row.custom_palma_base_rate) * flt(row.qty || 1);
+                    per_row_discount = flt(dval * (row_amount / total_amount), 2);
+                    allocated_so_far += per_row_discount;
+                }
                 frappe.model.set_value(row.doctype, row.name, "custom_palma_discount_type", dtype);
                 frappe.model.set_value(row.doctype, row.name, "custom_palma_discount_amount", per_row_discount);
             });

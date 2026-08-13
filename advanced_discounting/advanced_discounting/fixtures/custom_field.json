@@ -1,5 +1,6 @@
 [
  {
+  "name": "Purchase Order Item-custom_disc_eligible",
   "docstatus": 0,
   "doctype": "Custom Field",
   "dt": "Purchase Order Item",
@@ -11,6 +12,7 @@
   "description": "Marks this PO row as participating in the PO-level discount pool"
  },
  {
+  "name": "Purchase Receipt-custom_disc_is_historical",
   "docstatus": 0,
   "doctype": "Custom Field",
   "dt": "Purchase Receipt",
@@ -22,6 +24,7 @@
   "description": "When checked, skips proportional discount auto-calculation entirely"
  },
  {
+  "name": "Purchase Receipt-custom_disc_allocation_log",
   "docstatus": 0,
   "doctype": "Custom Field",
   "dt": "Purchase Receipt",
@@ -32,6 +35,7 @@
   "label": "Discount Allocation Log"
  },
  {
+  "name": "Purchase Receipt Item-custom_disc_allocated_discount",
   "docstatus": 0,
   "doctype": "Custom Field",
   "dt": "Purchase Receipt Item",
@@ -41,5 +45,191 @@
   "label": "Allocated Discount",
   "read_only": 1,
   "description": "Proportional share of PO discount allocated to this PR row (Audit only - standard discount_amount is also updated)"
+ },
+ {
+  "name": "Purchase Order Item-custom_palma_base_rate",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Order Item",
+  "fieldname": "custom_palma_base_rate",
+  "fieldtype": "Currency",
+  "insert_after": "qty",
+  "label": "Palma Base Rate"
+ },
+ {
+  "name": "Purchase Order Item-custom_palma_discount_type",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Order Item",
+  "fieldname": "custom_palma_discount_type",
+  "fieldtype": "Select",
+  "options": "\nPercentage\nAmount",
+  "insert_after": "custom_palma_base_rate",
+  "label": "Palma Discount Type"
+ },
+ {
+  "name": "Purchase Order Item-custom_palma_discount_amount",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Order Item",
+  "fieldname": "custom_palma_discount_amount",
+  "fieldtype": "Currency",
+  "insert_after": "custom_palma_discount_type",
+  "label": "Palma Discount Amount"
+ },
+ {
+  "name": "Purchase Order-custom_palma_global_disc_type",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Order",
+  "fieldname": "custom_palma_global_disc_type",
+  "fieldtype": "Select",
+  "options": "\nPercentage\nAmount",
+  "insert_after": "apply_discount_on",
+  "label": "Palma Global Disc Type"
+ },
+ {
+  "name": "Purchase Order-custom_palma_global_disc_value",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Order",
+  "fieldname": "custom_palma_global_disc_value",
+  "fieldtype": "Currency",
+  "insert_after": "custom_palma_global_disc_type",
+  "label": "Palma Global Disc Value"
+ },
+ {
+  "name": "Purchase Order-custom_apply_global_discount",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Order",
+  "fieldname": "custom_apply_global_discount",
+  "fieldtype": "Button",
+  "insert_after": "custom_palma_global_disc_value",
+  "label": "Apply Global Discount"
+ },
+ {
+  "name": "Purchase Invoice Item-custom_palma_base_rate",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Invoice Item",
+  "fieldname": "custom_palma_base_rate",
+  "fieldtype": "Currency",
+  "insert_after": "qty",
+  "label": "Palma Base Rate"
+ },
+ {
+  "name": "Purchase Invoice Item-custom_palma_discount_type",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Invoice Item",
+  "fieldname": "custom_palma_discount_type",
+  "fieldtype": "Select",
+  "options": "\nPercentage\nAmount",
+  "insert_after": "custom_palma_base_rate",
+  "label": "Palma Discount Type"
+ },
+ {
+  "name": "Purchase Invoice Item-custom_palma_discount_amount",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Invoice Item",
+  "fieldname": "custom_palma_discount_amount",
+  "fieldtype": "Currency",
+  "insert_after": "custom_palma_discount_type",
+  "label": "Palma Discount Amount"
+ },
+ {
+  "name": "Purchase Invoice-custom_palma_global_disc_type",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Invoice",
+  "fieldname": "custom_palma_global_disc_type",
+  "fieldtype": "Select",
+  "options": "\nPercentage\nAmount",
+  "insert_after": "apply_discount_on",
+  "label": "Palma Global Disc Type"
+ },
+ {
+  "name": "Purchase Invoice-custom_palma_global_disc_value",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Invoice",
+  "fieldname": "custom_palma_global_disc_value",
+  "fieldtype": "Currency",
+  "insert_after": "custom_palma_global_disc_type",
+  "label": "Palma Global Disc Value"
+ },
+ {
+  "name": "Purchase Invoice-custom_apply_global_discount",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Invoice",
+  "fieldname": "custom_apply_global_discount",
+  "fieldtype": "Button",
+  "insert_after": "custom_palma_global_disc_value",
+  "label": "Apply Global Discount"
+ },
+ {
+  "name": "Purchase Receipt Item-custom_palma_base_rate",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Receipt Item",
+  "fieldname": "custom_palma_base_rate",
+  "fieldtype": "Currency",
+  "insert_after": "qty",
+  "label": "Palma Base Rate"
+ },
+ {
+  "name": "Purchase Receipt Item-custom_palma_discount_type",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Receipt Item",
+  "fieldname": "custom_palma_discount_type",
+  "fieldtype": "Select",
+  "options": "\nPercentage\nAmount",
+  "insert_after": "custom_palma_base_rate",
+  "label": "Palma Discount Type"
+ },
+ {
+  "name": "Purchase Receipt Item-custom_palma_discount_amount",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Receipt Item",
+  "fieldname": "custom_palma_discount_amount",
+  "fieldtype": "Currency",
+  "insert_after": "custom_palma_discount_type",
+  "label": "Palma Discount Amount"
+ },
+ {
+  "name": "Purchase Receipt-custom_palma_global_disc_type",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Receipt",
+  "fieldname": "custom_palma_global_disc_type",
+  "fieldtype": "Select",
+  "options": "\nPercentage\nAmount",
+  "insert_after": "apply_discount_on",
+  "label": "Palma Global Disc Type"
+ },
+ {
+  "name": "Purchase Receipt-custom_palma_global_disc_value",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Receipt",
+  "fieldname": "custom_palma_global_disc_value",
+  "fieldtype": "Currency",
+  "insert_after": "custom_palma_global_disc_type",
+  "label": "Palma Global Disc Value"
+ },
+ {
+  "name": "Purchase Receipt-custom_apply_global_discount",
+  "docstatus": 0,
+  "doctype": "Custom Field",
+  "dt": "Purchase Receipt",
+  "fieldname": "custom_apply_global_discount",
+  "fieldtype": "Button",
+  "insert_after": "custom_palma_global_disc_value",
+  "label": "Apply Global Discount"
  }
 ]
